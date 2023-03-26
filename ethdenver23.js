@@ -57,9 +57,9 @@ az_up.forEach(c1 => {
 
 let riddles = [
   [ RIDDLE_1_HASH, 'faucet' ],    // cccccc
-  [ RIDDLE_2_HASH, '???' ],       // Ccc Ccccc
+  [ RIDDLE_2_HASH, 'The Merge' ], // Ccc Ccccc
   [ RIDDLE_3_HASH, 'EIP-4844' ],  // CCC-NNNN
 ]
 riddles.forEach((rr, i) => {
-  console.log(`R${i+1}`, keccak256(rr[1]).toString('hex') == rr[0])
+  console.log(`R${i+1}`, keccak256(rr[1]).toString('hex') == rr[0], rr[1])
 })
