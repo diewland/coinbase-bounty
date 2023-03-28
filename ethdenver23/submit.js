@@ -22,40 +22,59 @@ let contract = new ethers.Contract(RIDDLE_ADDR, RIDDLE_ABI, wallet)
 
 async function main() {
 
+  // answer
+  const ANSWER_1 = 'faucet'    // cccccc
+  const ANSWER_2 = 'The Merge' // Ccc Ccccc
+  const ANSWER_3 = 'EIP-4844'  // CCC-NNNN
+
+  // wallet info
+  let balance = await provider.getBalance(wallet.address)
+  console.log(wallet.address, '->' , formatUnits(balance), 'ETH')
+  console.log('---')
+
   // recheck result
   let riddles = [
-    [ RIDDLE_1_HASH, 'faucet' ],    // cccccc
-    [ RIDDLE_2_HASH, 'The Merge' ], // Ccc Ccccc
-    [ RIDDLE_3_HASH, 'EIP-4844' ],  // CCC-NNNN
+    [ RIDDLE_1_HASH, ANSWER_1 ],
+    [ RIDDLE_2_HASH, ANSWER_2 ],
+    [ RIDDLE_3_HASH, ANSWER_3 ],
   ]
   riddles.forEach((rr, i) => {
     console.log(`RIDDLE#${i+1}`, keccak256(toUtf8Bytes(rr[1])) == rr[0], rr[1])
   })
+  console.log('---')
 
-  // wallet info
-  //let balance = await provider.getBalance(wallet.address)
-  //console.log(wallet.address, '->' , formatUnits(balance))
-
-  // test access property
+  // RIDDLE#1
+  let out1 = null
   try {
-
-    //let out = await contract.solveChallenge1.send('faucet')
-
-    //let answer = 'The Merge'
-    //let signature = await wallet.signMessage(answer)
-    //let out = await contract.solveChallenge2.send(answer, signature)
-    //console.log(out)
-
-    let answer = 'EIP-4844'
-    let signature = await wallet.signMessage(answer)
-    let out = await contract.solveChallenge3.send(answer, wallet.address, signature)
-    console.log(out)
-
+    out1 =  await contract.solveChallenge1.send(ANSWER_1)
   }
   catch(err) {
-    //console.log(err)
-    console.log(err.reason)
+    out1 = err.reason
   }
+  console.log('submit #1:', out1)
+
+  // RIDDLE#2
+  let out2 = null
+  try {
+    let signature = await wallet.signMessage(RIDDLE_2_HASH)
+    out2 =  await contract.solveChallenge2.send(ANSWER_2, signature)
+  }
+  catch(err) {
+    out2 = err.reason
+  }
+  console.log('submit #2:', out2)
+
+  // RIDDLE#3
+  let out3 = null
+  try {
+    let signature = await wallet.signMessage(RIDDLE_3_HASH)
+    let signer = wallet.address // TODO ???
+    out3 =  await contract.solveChallenge3.send(ANSWER_3, signer, signature)
+  }
+  catch(err) {
+    out3 = err.reason
+  }
+  console.log('submit #3:', out3)
 
 }
 main().then(_ => process.exit(0)).catch(error => { console.error(error); process.exit(1) })
